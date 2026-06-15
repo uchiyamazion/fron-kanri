@@ -1,0 +1,31 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #f2f1ec;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, select, textarea {
+  border: 0.5px solid rgba(0,0,0,.2);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  color: inherit;
+  background: #fff;
+  width: 100%;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #185FA5;
+  box-shadow: 0 0 0 2px rgba(24,95,165,.12);
+}
+
+button { font-family: inherit; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }
