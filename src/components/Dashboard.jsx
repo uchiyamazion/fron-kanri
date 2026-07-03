@@ -1,5 +1,6 @@
 import { Badge, statusVariant, statusLabel } from './Badge'
 import { daysDiff, nextLegalInspection, nextSimpleInspection, calcLeakSummary, addMonths } from '../utils'
+import { GWP } from '../constants'
 
 function MetricCard({ label, value, sub, danger }) {
   return (
@@ -118,7 +119,6 @@ export function Dashboard({ db }) {
               </thead>
               <tbody>
                 {Object.entries(refMap).map(([ref, v]) => {
-                  const { GWP } = require('../constants')
                   const gwp = GWP[ref] || 100
                   const co2 = Math.round(v.leak * gwp / 1000)
                   return (
