@@ -9,6 +9,8 @@ const PAGE_H = 841.44 // A4 pt
 // 元PDFの空欄座標（pdfplumberで実測したラベル位置を基準にオフセット）
 // top = ページ上端からの距離(pt)、x = 左端からの距離(pt)
 const FIELDS = {
+  addressee: { x: 68, top: 121.5, size: 11 },
+
   issueYear:  { x: 232, top: 224, size: 9 },
   issueMonth: { x: 296, top: 224, size: 9 },
   issueDay:   { x: 362, top: 224, size: 9 },
@@ -52,9 +54,9 @@ const FIELDS = {
 
   qualNo: { x: 402, top: 709.8, size: 8.5 },
 
-  // 機器の種類チェック（□の中に✓）
-  checkAircon: { x: 211, top: 436.8, size: 9 },
-  checkFridge:  { x: 390, top: 436.8, size: 9 },
+  // 機器の種類チェック（□の中に✓）実測ボックス座標: x0=387.6 x1=396.1 top=428.7 bottom=437.2（冷蔵機器側の実測値、エアコン側は同じ行）
+  checkAircon: { x: 206.5, top: 428.9, size: 8 },
+  checkFridge: { x: 389.5, top: 428.9, size: 8 },
 }
 
 async function loadResources() {
@@ -93,6 +95,8 @@ export async function fillDestructionCertificate(eq, recoveries = [], fills = []
   const page = pdfDoc.getPages()[0]
 
   const issue = opts.issueDate ? new Date(opts.issueDate) : new Date()
+  draw(page, font, 'addressee', eq.customerName || '')
+
   draw(page, font, 'issueYear', issue.getFullYear())
   draw(page, font, 'issueMonth', issue.getMonth() + 1)
   draw(page, font, 'issueDay', issue.getDate())
