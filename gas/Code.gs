@@ -81,11 +81,14 @@ const FILL_COLUMNS = [
   'createdAt'
 ];
 
-// ── 法定点検カラム ────────────────────────────────────────────
+// ── 法定点検カラム（冷媒漏えい点検・整備記録簿 準拠）──────────────
 const LEGAL_COLUMNS = [
   'id', 'eqMasterId', 'inspectionId',
-  'date', 'type',      // 1year / 3year
-  'inspector', 'method', 'result',
+  'date', 'category',                        // 作業年月日 / 点検・整備区分
+  'fillAmount', 'refillAmount', 'recoveryAmount', // 充填量 / 回収戻し充填量 / 回収量
+  'method', 'result',                        // 点検内容 / 点検結果
+  'cause', 'location', 'repair',             // 漏えい・故障の原因 / 箇所 / 修理の内容
+  'vendor', 'technician',                    // 業者名 / 技術者氏名
   'note', 'createdAt'
 ];
 
@@ -560,8 +563,11 @@ function fronLoad() {
     const obj = rowToObj(legalHeaders, row);
     return {
       id: obj.id, eqId: obj.eqMasterId, date: obj.date,
-      type: obj.type, inspector: obj.inspector,
-      method: obj.method, result: obj.result, note: obj.note,
+      category: obj.category,
+      fillAmount: obj.fillAmount, refillAmount: obj.refillAmount, recoveryAmount: obj.recoveryAmount,
+      method: obj.method, result: obj.result,
+      cause: obj.cause, location: obj.location, repair: obj.repair,
+      vendor: obj.vendor, technician: obj.technician, note: obj.note,
     };
   });
 
@@ -603,6 +609,23 @@ function fronSave(data) {
         status:       eq.status,
         note:         eq.note,
       });
+    });
+  }
+
+  // 点検・整備記録（法定点検）をシートへ全件反映（フロント側が唯一の管理元のため全洗い替え）
+  if (data.legal) {
+    const legalSheet = getOrCreateSheet(SHEET_LEGAL, LEGAL_COLUMNS, '#1565C0');
+    legalSheet.clearContents();
+    legalSheet.appendRow(LEGAL_COLUMNS);
+    const now = new Date().toISOString();
+    data.legal.forEach(r => {
+      const row = LEGAL_COLUMNS.map(col => {
+        if (col === 'id')          return r.id || Utilities.getUuid();
+        if (col === 'eqMasterId')  return r.eqId || r.eqMasterId || '';
+        if (col === 'createdAt')   return r.createdAt || now;
+        return r[col] !== undefined ? r[col] : '';
+      });
+      legalSheet.appendRow(row);
     });
   }
 
