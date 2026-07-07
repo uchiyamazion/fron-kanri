@@ -43,7 +43,23 @@ export const LEGAL_RESULT_LABELS = {
   repair: '修理要',
 }
 
-// ── 冷媒漏えい点検・整備記録簿 準拠 ドロップダウン項目 ──────────────
+// 帳票出力用 自社情報（点検・整備実施者としての既定値）
+export const COMPANY_INFO = {
+  name: 'シオンテクノス株式会社',
+  address: '〒007-0824 札幌市東区北24条東4丁目1-1',
+  tel: '011-751-8686',
+  fax: '011-702-0070',
+}
+
+// 帳票参考表示用 主要冷媒GWP値（一部）
+export const GWP_REFERENCE_ROW = [
+  { label: 'R22',    gwp: 1810 },
+  { label: 'R32',    gwp: 675 },
+  { label: 'R134a',  gwp: 1430 },
+  { label: 'R404A',  gwp: 3922 },
+  { label: 'R407C',  gwp: 1774 },
+  { label: 'R410A',  gwp: 2088 },
+]
 
 // ④ 点検・整備区分
 export const INSPECTION_CATEGORY_OPTIONS = [

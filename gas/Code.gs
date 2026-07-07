@@ -67,6 +67,9 @@ const EQUIPMENT_COLUMNS = [
   'note',
   'lastSimpleDate',  // 最終簡易点検日
   'lastLegalDate',   // 最終法定点検日
+  'facilityName',    // 施設名称（帳票用、未入力時はcustomerNameを使用）
+  'facilityAddress', // 施設住所（帳票用、未入力時はaddressを使用）
+  'operManager',     // 運転管理責任者（帳票用）
   'createdAt',
   'updatedAt'
 ];
@@ -538,8 +541,12 @@ function fronLoad() {
     installed:eq.installed,
     status:   eq.status || 'active',
     note:     eq.note,
+    customerName: eq.customerName,
     lastSimple: eq.lastSimpleDate,
     lastLegal:  eq.lastLegalDate,
+    facilityName:    eq.facilityName,
+    facilityAddress: eq.facilityAddress,
+    operManager:     eq.operManager,
   }));
 
   const allFills = listFillRecords();
@@ -602,12 +609,16 @@ function fronSave(data) {
       upsertEquipment({
         id:           eq.id,
         systemName:   eq.name,
+        customerName: eq.customerName,
         refrigerant:  eq.ref,
         refShip:      eq.charge,
         kw:           eq.kw,
         installed:    eq.installed,
         status:       eq.status,
         note:         eq.note,
+        facilityName:    eq.facilityName,
+        facilityAddress: eq.facilityAddress,
+        operManager:     eq.operManager,
       });
     });
   }

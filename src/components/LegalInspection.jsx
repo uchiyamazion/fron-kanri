@@ -5,6 +5,7 @@ import {
   LEAK_CAUSE_OPTIONS, LEAK_LOCATION_OPTIONS, REPAIR_CONTENT_OPTIONS,
 } from '../constants'
 import { Badge, statusVariant, statusLabel } from './Badge'
+import { LegalRecordPrint } from './LegalRecordPrint'
 
 const NO_UPDATE_CATEGORIES = ['廃棄', '譲渡']
 
@@ -25,6 +26,7 @@ const headStyle = { textAlign: 'left', padding: '6px 6px', borderBottom: '0.5px 
 export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toast }) {
   const [form, setForm] = useState(emptyForm())
   const [listFilter, setListFilter] = useState('')
+  const [showPrint, setShowPrint] = useState(false)
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
 
   const needsRepairInfo = form.category === '漏えい修理' || form.result !== 'なし'
@@ -190,10 +192,18 @@ export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toa
       <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.1)', borderRadius: 12, padding: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <span style={{ fontWeight: 500, fontSize: 13 }}>点検・整備記録一覧</span>
-          <select value={listFilter} onChange={e => setListFilter(e.target.value)} style={{ fontSize: 12 }}>
-            <option value="">全機器</option>
-            {db.equipment.map(eq => <option key={eq.id} value={eq.id}>{eq.id} / {eq.name}</option>)}
-          </select>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <select value={listFilter} onChange={e => setListFilter(e.target.value)} style={{ fontSize: 12 }}>
+              <option value="">全機器</option>
+              {db.equipment.map(eq => <option key={eq.id} value={eq.id}>{eq.id} / {eq.name}</option>)}
+            </select>
+            <button
+              onClick={() => { if (!listFilter) { toast('印刷する機器を選択してください', 'error'); return } setShowPrint(true) }}
+              style={{ padding: '5px 12px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12 }}
+            >
+              帳票印刷
+            </button>
+          </div>
         </div>
         {records.length === 0
           ? <div style={{ color: '#888', fontSize: 12 }}>記録がありません</div>
@@ -235,6 +245,18 @@ export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toa
           )
         }
       </div>
+
+      {showPrint && (() => {
+        const eq = db.equipment.find(e => e.id === listFilter)
+        if (!eq) return null
+        return (
+          <LegalRecordPrint
+            eq={eq}
+            records={db.legal.filter(r => r.eqId === eq.id)}
+            onClose={() => setShowPrint(false)}
+          />
+        )
+      })()}
     </div>
   )
 }

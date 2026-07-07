@@ -4,9 +4,10 @@ import { REFRIGERANT_OPTIONS, EQUIPMENT_STATUS } from '../constants'
 import { today, daysDiff, nextLegalInspection, legalInspectionType } from '../utils'
 
 const empty = () => ({
-  id: '', name: '', model: '', location: '',
+  id: '', name: '', model: '', location: '', customerName: '',
   ref: 'R-410A', charge: '', kw: '',
   installed: today(), status: 'active', note: '',
+  facilityName: '', facilityAddress: '', operManager: '',
 })
 
 export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
@@ -119,6 +120,7 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器名 *</label><input value={form.name} onChange={set('name')} placeholder="例: 業務用エアコン" /></div>
             </div>
             <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>型番・メーカー</label><input value={form.model} onChange={set('model')} placeholder="例: 三菱 PEA-P224" /></div>
+            <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器の管理者（お客様名・法人名）</label><input value={form.customerName} onChange={set('customerName')} placeholder="例: 株式会社○○" /></div>
             <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>設置場所 *</label><input value={form.location} onChange={set('location')} placeholder="例: A棟1F 会議室" /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>冷媒種別 *</label>
@@ -138,6 +140,16 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
               </div>
             </div>
             <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>備考</label><textarea value={form.note} onChange={set('note')} style={{ width: '100%', minHeight: 60 }} /></div>
+
+            <div style={{ borderTop: '0.5px dashed rgba(0,0,0,.15)', paddingTop: 10, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>帳票出力用（冷媒漏えい点検・整備記録簿）</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>施設名称（未入力時は設置場所を使用）</label><input value={form.facilityName} onChange={set('facilityName')} placeholder="例: ○○ビル" /></div>
+                <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>運転管理責任者</label><input value={form.operManager} onChange={set('operManager')} placeholder="例: 山田 太郎" /></div>
+              </div>
+              <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>施設住所（未入力時は設置場所を使用）</label><input value={form.facilityAddress} onChange={set('facilityAddress')} /></div>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button onClick={closeModal} style={{ padding: '7px 14px', border: '0.5px solid rgba(0,0,0,.2)', borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 13 }}>キャンセル</button>
               <button onClick={save} style={{ padding: '7px 14px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>保存</button>
