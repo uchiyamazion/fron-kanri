@@ -63,6 +63,7 @@ export const GWP_REFERENCE_ROW = [
 
 // ④ 点検・整備区分
 export const INSPECTION_CATEGORY_OPTIONS = [
+  '出荷時初期充填量', '設置時追加充填量',
   '設置時点検', '定期点検', '呼出点検', '漏えい修理', '整備(修理)後点検', '廃棄', '譲渡', 'その他',
 ]
 

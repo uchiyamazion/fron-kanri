@@ -115,14 +115,14 @@ export function LegalRecordPrint({ eq, records, db, onClose }) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              {['作業年月日', '点検・整備区分', '充填量(kg)', '回収戻し充填量(kg)', '回収量(kg)', '点検内容', '点検結果', '漏えい・故障の原因', '漏えい・故障箇所', '修理の内容', '点検・修理・回収・充塡業者名', '技術者氏名'].map(h => (
+              {['作業年月日', '点検・整備区分', '充填量(kg)', '回収戻し充填量(kg)', '回収量(kg)', '点検内容', '点検結果', '漏えい・故障の原因', '漏えい・故障箇所', '修理の内容', '点検・修理・回収・充塡業者名', '技術者氏名', '技術者No.', '修理困難理由', '修理予定日'].map(h => (
                 <th key={h} style={{ ...cell, background: '#e5e5e5', fontWeight: 700, fontSize: 10 }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {sorted.length === 0 && (
-              <tr><td style={cell} colSpan={12}>記録がありません</td></tr>
+              <tr><td style={cell} colSpan={15}>記録がありません</td></tr>
             )}
             {sorted.map(r => (
               <tr key={r.id} style={{ breakInside: 'avoid' }}>
@@ -138,6 +138,9 @@ export function LegalRecordPrint({ eq, records, db, onClose }) {
                 <td style={cell}>{r.repair}</td>
                 <td style={cell}>{r.vendor}</td>
                 <td style={cell}>{r.technician}</td>
+                <td style={cell}>{db?.technicians?.find(t => t.name === r.technician)?.qualNo || ''}</td>
+                <td style={cell}>{r.repairReason || ''}</td>
+                <td style={cell}>{r.repairDueDate || ''}</td>
               </tr>
             ))}
             <tr>
@@ -145,7 +148,7 @@ export function LegalRecordPrint({ eq, records, db, onClose }) {
               <td style={{ ...cell, textAlign: 'right', fontWeight: 700 }}>{totalFill.toFixed(1)}</td>
               <td style={{ ...cell, textAlign: 'right', fontWeight: 700 }}>{totalRefill.toFixed(1)}</td>
               <td style={{ ...cell, textAlign: 'right', fontWeight: 700 }}>{totalRecovery.toFixed(1)}</td>
-              <td style={cell} colSpan={7}></td>
+              <td style={cell} colSpan={10}></td>
             </tr>
           </tbody>
         </table>
