@@ -8,6 +8,7 @@ import { LegalInspection } from './components/LegalInspection'
 import { FillRecovery } from './components/FillRecovery'
 import { Report } from './components/Report'
 import { VendorTechnician } from './components/VendorTechnician'
+import { ProcessControlSheet } from './components/ProcessControlSheet'
 import { Toast } from './components/Toast'
 import { SyncStatus } from './utils/gasClient'
 
@@ -18,6 +19,7 @@ const NAV = [
   { id: 'simple',     label: '簡易点検',          section: '点検管理' },
   { id: 'legal',      label: '法定点検',          section: '点検管理' },
   { id: 'fill',       label: '充填・回収',         section: 'フロン記録' },
+  { id: 'process',    label: '行程管理票（廃棄時）', section: 'フロン記録' },
   { id: 'report',     label: '漏洩量・報告書',     section: 'フロン記録' },
 ]
 
@@ -88,6 +90,7 @@ export default function App() {
     simple:    <SimpleInspection {...pageProps} />,
     legal:     <LegalInspection {...pageProps} />,
     fill:      <FillRecovery {...pageProps} />,
+    process:   <ProcessControlSheet db={db} toast={showToast} />,
     report:    <Report db={db} toast={showToast} />,
   }
 
