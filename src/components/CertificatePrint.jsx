@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { fillDestructionCertificate } from '../utils/certificateFill'
 import { GWP } from '../constants'
 import { today } from '../utils'
+import { DestructionCertificatePrint } from './DestructionCertificatePrint'
 
 export function CertificatePrint({ db, onClose, toast }) {
   const [eqId, setEqId] = useState('')
@@ -10,7 +10,8 @@ export function CertificatePrint({ db, onClose, toast }) {
   const [selFill, setSelFill] = useState([])
   const [note, setNote] = useState('')
   const [qualNo, setQualNo] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [technician, setTechnician] = useState('')
+  const [showPrint, setShowPrint] = useState(false)
 
   const eq = db.equipment.find(e => e.id === eqId)
   const recOptions = db.recoveries.filter(r => r.eqId === eqId).sort((a, b) => b.date.localeCompare(a.date))
@@ -20,22 +21,24 @@ export function CertificatePrint({ db, onClose, toast }) {
     setList(list.includes(id) ? list.filter(x => x !== id) : list.length >= 2 ? [list[1], id] : [...list, id])
   }
 
-  async function generate() {
+  function openPrint() {
     if (!eq) { toast('機器を選択してください', 'error'); return }
-    setBusy(true)
-    try {
-      const recs = recOptions.filter(r => selRec.includes(r.id))
-      const fils = fillOptions.filter(f => selFill.includes(f.id))
-      const gwp = GWP?.[eq.ref] || ''
-      const blob = await fillDestructionCertificate(eq, recs, fils, { issueDate, note, qualNo, gwp })
-      const url = URL.createObjectURL(blob)
-      window.open(url, '_blank')
-    } catch (e) {
-      console.error(e)
-      toast('証明書の生成に失敗しました: ' + e.message, 'error')
-    } finally {
-      setBusy(false)
-    }
+    setShowPrint(true)
+  }
+
+  if (showPrint && eq) {
+    const recs = recOptions.filter(r => selRec.includes(r.id))
+    const fils = fillOptions.filter(f => selFill.includes(f.id))
+    const gwp = GWP?.[eq.ref] || ''
+    return (
+      <DestructionCertificatePrint
+        eq={eq}
+        recoveries={recs}
+        fills={fils}
+        opts={{ issueDate, note, qualNo, technician, gwp }}
+        onClose={onClose}
+      />
+    )
   }
 
   return (
@@ -57,6 +60,11 @@ export function CertificatePrint({ db, onClose, toast }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
           <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>交付年月日</label><input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} style={{ width: '100%' }} /></div>
           <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>資格者番号</label><input value={qualNo} onChange={e => setQualNo(e.target.value)} style={{ width: '100%' }} /></div>
+        </div>
+
+        <div style={{ marginBottom: 10 }}>
+          <label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>充填作業者又は立会者（冷媒フロン類取扱技術者）</label>
+          <input value={technician} onChange={e => setTechnician(e.target.value)} style={{ width: '100%' }} />
         </div>
 
         {eq && (
@@ -94,8 +102,8 @@ export function CertificatePrint({ db, onClose, toast }) {
           <textarea value={note} onChange={e => setNote(e.target.value)} style={{ width: '100%', minHeight: 44 }} />
         </div>
 
-        <button onClick={generate} disabled={busy || !eq} style={{ width: '100%', padding: '9px', background: busy ? '#9db6d3' : '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: busy ? 'default' : 'pointer', fontSize: 13 }}>
-          {busy ? '生成中…' : 'PDFを生成して開く'}
+        <button onClick={openPrint} disabled={!eq} style={{ width: '100%', padding: '9px', background: eq ? '#185FA5' : '#9db6d3', color: '#fff', border: 'none', borderRadius: 8, cursor: eq ? 'pointer' : 'default', fontSize: 13 }}>
+          プレビュー / 印刷
         </button>
       </div>
     </div>
