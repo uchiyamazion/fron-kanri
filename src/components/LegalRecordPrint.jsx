@@ -1,4 +1,4 @@
-import { COMPANY_INFO, GWP_REFERENCE_ROW } from '../constants'
+import { GWP_REFERENCE_ROW } from '../constants'
 
 const box = { border: '1px solid #000' }
 const cell = { border: '1px solid #000', padding: '3px 6px', fontSize: 10.5, verticalAlign: 'middle' }
@@ -8,7 +8,7 @@ function sum(records, key) {
   return records.reduce((s, r) => s + (parseFloat(r[key]) || 0), 0)
 }
 
-export function LegalRecordPrint({ eq, records, onClose }) {
+export function LegalRecordPrint({ eq, records, db, onClose }) {
   const sorted = records.slice().sort((a, b) => a.date.localeCompare(b.date))
   const firstDate = sorted[0]?.date || ''
   const lastDate = sorted[sorted.length - 1]?.date || ''
@@ -20,6 +20,13 @@ export function LegalRecordPrint({ eq, records, onClose }) {
 
   const facilityName = eq.facilityName || eq.name
   const facilityAddress = eq.facilityAddress || eq.location
+
+  // 直近の記録に記載された業者名から、業者マスタの住所・電話番号を解決（無ければ名前のみ表示）
+  const latestVendorName = sorted[sorted.length - 1]?.vendor || ''
+  const vendor = db?.vendors?.find(v => v.name === latestVendorName)
+  const vendorLine = vendor
+    ? `${vendor.name}　${vendor.address || ''}${vendor.tel ? `　TEL ${vendor.tel}` : ''}`
+    : latestVendorName
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', overflowY: 'auto', padding: '24px 0' }}>
@@ -66,7 +73,7 @@ export function LegalRecordPrint({ eq, records, onClose }) {
             </tr>
             <tr>
               <td style={labelCell}>点検等業者名住所</td>
-              <td style={cell} colSpan={2}>{COMPANY_INFO.name}　{COMPANY_INFO.address}　TEL {COMPANY_INFO.tel}</td>
+              <td style={cell} colSpan={2}>{vendorLine}</td>
               <td style={labelCell}>製番</td>
               <td style={cell} colSpan={3}>{eq.id}</td>
             </tr>

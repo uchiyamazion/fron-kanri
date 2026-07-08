@@ -268,6 +268,7 @@ export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toa
           <LegalRecordPrint
             eq={eq}
             records={db.legal.filter(r => r.eqId === eq.id)}
+            db={db}
             onClose={() => setShowPrint(false)}
           />
         )
