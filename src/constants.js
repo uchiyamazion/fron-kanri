@@ -49,6 +49,7 @@ export const COMPANY_INFO = {
   address: '〒007-0824 札幌市東区北24条東4丁目1-1',
   tel: '011-751-8686',
   fax: '011-702-0070',
+  registrationNo: '0110100267',
 }
 
 // 帳票参考表示用 主要冷媒GWP値（一部）

@@ -122,8 +122,6 @@ export default function App() {
 
         <div style={{ padding: '10px 16px', borderTop: '0.5px solid rgba(0,0,0,.08)' }}>
           <SyncBadge status={syncStatus} error={syncError} onRetry={manualSync} />
-          <div style={{ marginTop: 6, fontSize: 11, color: '#888' }}>管理者</div>
-          <div style={{ fontSize: 12, fontWeight: 500 }}>田中 点検太郎</div>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { today } from '../utils'
+import { COMPANY_INFO } from '../constants'
 import { downloadProcessControlSheet } from '../utils/processControlSheet'
 
 const labelStyle = { fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }
@@ -34,7 +35,8 @@ const emptyForm = () => ({
 })
 
 export function ProcessControlSheet({ db, toast }) {
-  const [form, setForm] = useState(emptyForm())
+  const defaultVendor = db.vendors.find(v => v.name === COMPANY_INFO.name)
+  const [form, setForm] = useState({ ...emptyForm(), vendorId: defaultVendor?.id || '' })
   const [grid, setGrid] = useState({})
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
   const setChk = k => e => setForm(f => ({ ...f, [k]: e.target.checked }))
@@ -69,7 +71,7 @@ export function ProcessControlSheet({ db, toast }) {
   async function download() {
     if (!form.ownerName) { toast('機器所有者等の名称を入力してください（機器を選ぶと自動入力されます）', 'error'); return }
     try {
-      const vendor = db.vendors.find(v => v.id === form.vendorId)
+      const vendor = db.vendors.find(v => v.id === form.vendorId) || COMPANY_INFO
       const payload = {
         ...form,
         ...grid,
