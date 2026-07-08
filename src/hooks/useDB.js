@@ -10,6 +10,9 @@ const defaultDB = {
   legal: [],
   fills: [],
   recoveries: [],
+  vendors: [],
+  technicians: [],
+  inspections: [],
 }
 
 function loadFromLocal() {

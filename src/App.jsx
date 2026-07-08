@@ -7,12 +7,14 @@ import { SimpleInspection } from './components/SimpleInspection'
 import { LegalInspection } from './components/LegalInspection'
 import { FillRecovery } from './components/FillRecovery'
 import { Report } from './components/Report'
+import { VendorTechnician } from './components/VendorTechnician'
 import { Toast } from './components/Toast'
 import { SyncStatus } from './utils/gasClient'
 
 const NAV = [
   { id: 'dashboard',  label: 'ダッシュボード', section: 'メイン' },
   { id: 'equipment',  label: '機器台帳',         section: 'メイン' },
+  { id: 'vendors',    label: '業者・技術者',      section: 'メイン' },
   { id: 'simple',     label: '簡易点検',          section: '点検管理' },
   { id: 'legal',      label: '法定点検',          section: '点検管理' },
   { id: 'fill',       label: '充填・回収',         section: 'フロン記録' },
@@ -82,6 +84,7 @@ export default function App() {
   const pages = {
     dashboard: <Dashboard db={db} />,
     equipment: <Equipment {...pageProps} />,
+    vendors:   <VendorTechnician {...pageProps} />,
     simple:    <SimpleInspection {...pageProps} />,
     legal:     <LegalInspection {...pageProps} />,
     fill:      <FillRecovery {...pageProps} />,

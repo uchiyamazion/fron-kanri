@@ -16,7 +16,7 @@ const emptyForm = () => ({
   method: 'システム漏えい試験（気密試験）',
   result: 'なし',
   cause: '', location: '', repair: '',
-  vendor: '', technician: '', note: '',
+  vendorId: '', technicianId: '', note: '',
 })
 
 const labelStyle = { fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }
@@ -33,7 +33,10 @@ export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toa
 
   function save() {
     if (!form.eqId || !form.date) { toast('機器と作業年月日を選択してください', 'error'); return }
-    addRecord('legal', { ...form })
+    const vendorName = db.vendors.find(v => v.id === form.vendorId)?.name || ''
+    const technicianName = db.technicians.find(t => t.id === form.technicianId)?.name || ''
+    const { vendorId, technicianId, ...rest } = form
+    addRecord('legal', { ...rest, vendor: vendorName, technician: technicianName })
     if (!NO_UPDATE_CATEGORIES.includes(form.category)) {
       const eq = db.equipment.find(e => e.id === form.eqId)
       if (eq) updateRecord('equipment', eq.id, { lastLegal: form.date })
@@ -136,8 +139,20 @@ export function LegalInspection({ db, addRecord, deleteRecord, updateRecord, toa
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <div><label style={labelStyle}>点検・修理・回収・充塡業者名</label><input value={form.vendor} onChange={set('vendor')} placeholder="例: 冷凍空調設備株式会社" style={{ width: '100%' }} /></div>
-            <div><label style={labelStyle}>技術者氏名</label><input value={form.technician} onChange={set('technician')} placeholder="例: 佐藤太郎" style={{ width: '100%' }} /></div>
+            <div>
+              <label style={labelStyle}>点検・修理・回収・充塡業者名</label>
+              <select value={form.vendorId} onChange={set('vendorId')} style={{ width: '100%' }}>
+                <option value="">— 業者を選択 —</option>
+                {db.vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>技術者氏名</label>
+              <select value={form.technicianId} onChange={set('technicianId')} style={{ width: '100%' }}>
+                <option value="">— 技術者を選択 —</option>
+                {db.technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
           </div>
 
           <div style={{ marginBottom: 12 }}>

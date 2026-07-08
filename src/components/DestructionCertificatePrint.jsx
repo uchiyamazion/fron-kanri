@@ -1,5 +1,3 @@
-import { COMPANY_INFO } from '../constants'
-
 const cell = { border: '1px solid #4FB3C4', padding: '5px 8px', fontSize: 10.5, verticalAlign: 'middle', color: '#000' }
 const labelCell = { ...cell, color: '#2E9CB0', fontWeight: 500, whiteSpace: 'nowrap', width: 110 }
 const subLabelCell = { ...cell, color: '#2E9CB0', width: 70, whiteSpace: 'nowrap' }
@@ -10,11 +8,12 @@ function fmtDate(d) {
   return { y: dt.getFullYear(), m: dt.getMonth() + 1, d: dt.getDate() }
 }
 
-export function DestructionCertificatePrint({ eq, recoveries = [], fills = [], opts = {}, onClose }) {
+export function DestructionCertificatePrint({ eq, vendor, technician, recoveries = [], fills = [], opts = {}, onClose }) {
   const issue = fmtDate(opts.issueDate || new Date())
   const rec = recoveries.slice(0, 2)
   const fil = fills.slice(0, 2)
   const isFridge = (eq.model || '').includes('冷蔵') || (eq.model || '').includes('冷凍')
+  const v = vendor || {}
 
   const Box = ({ checked }) => (
     <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.3px solid #2E9CB0', textAlign: 'center', lineHeight: '11px', fontSize: 10, fontWeight: 700, marginRight: 6 }}>
@@ -39,10 +38,9 @@ export function DestructionCertificatePrint({ eq, recoveries = [], fills = [], o
               </td>
               <td style={{ border: 'none', width: '4%' }}></td>
               <td style={{ border: '1.3px solid #4FB3C4', padding: '8px 12px', fontSize: 10, color: '#2E9CB0', verticalAlign: 'top' }}>
-                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{COMPANY_INFO.name}</div>
-                <div>本　社：{COMPANY_INFO.address}</div>
-                <div style={{ paddingLeft: 42 }}>電話 {COMPANY_INFO.tel}</div>
-                <div style={{ paddingLeft: 42 }}>FAX {COMPANY_INFO.fax}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{v.name || ''}</div>
+                <div>{v.address || ''}</div>
+                <div>電話 {v.tel || ''}{v.fax ? `　FAX ${v.fax}` : ''}</div>
               </td>
             </tr>
           </tbody>
@@ -162,21 +160,21 @@ export function DestructionCertificatePrint({ eq, recoveries = [], fills = [], o
             <tr>
               <td style={{ ...cell, textAlign: 'center', color: '#2E9CB0' }} rowSpan={3}>充填回収業者</td>
               <td style={subLabelCell}>住所</td>
-              <td style={cell} colSpan={2}>{COMPANY_INFO.address}</td>
+              <td style={cell} colSpan={2}>{v.address || ''}</td>
               <td style={subLabelCell}>電話番号</td>
-              <td style={cell}>{COMPANY_INFO.tel}</td>
+              <td style={cell}>{v.tel || ''}</td>
             </tr>
             <tr>
               <td style={subLabelCell}>氏名・名称</td>
-              <td style={cell} colSpan={2}>{COMPANY_INFO.name}</td>
+              <td style={cell} colSpan={2}>{v.name || ''}</td>
               <td style={subLabelCell}>登録番号</td>
-              <td style={cell}>0110100267</td>
+              <td style={cell}>{v.registrationNo || ''}</td>
             </tr>
             <tr>
               <td style={subLabelCell}>充填作業者又は<br />立会者（冷媒フロン類取扱技術者）</td>
-              <td style={cell} colSpan={2}>{opts.technician || ''}</td>
+              <td style={cell} colSpan={2}>{technician?.name || ''}</td>
               <td style={subLabelCell}>資格者番号</td>
-              <td style={cell}>{opts.qualNo || ''}</td>
+              <td style={cell}>{technician?.qualNo || ''}</td>
             </tr>
           </tbody>
         </table>
@@ -187,7 +185,7 @@ export function DestructionCertificatePrint({ eq, recoveries = [], fills = [], o
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 18, fontSize: 15, fontWeight: 700, color: '#2E9CB0' }}>
-          {COMPANY_INFO.name}
+          {v.name || ''}
         </div>
       </div>
     </div>
