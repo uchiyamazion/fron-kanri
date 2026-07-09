@@ -97,6 +97,13 @@ export async function gasGetLeakSummary(year) {
   return gasGet({ action: 'leak_summary', year: year || '' })
 }
 
+// ── 充填・回収破壊証明書（QR共有ビュー用） ───────────────────
+
+/** 証明書1件を公開ビュー用に取得（機器・業者・技術者名を解決済みで返す） */
+export async function gasGetCertificate(id) {
+  return gasGet({ action: 'cert_get', id })
+}
+
 // ── 手動同期: 点検報告 → フロン管理 ─────────────────────────
 
 export async function gasSyncInspection(inspectionId) {

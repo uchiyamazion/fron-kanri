@@ -13,6 +13,7 @@ const defaultDB = {
   vendors: [],
   technicians: [],
   inspections: [],
+  certificates: [],
 }
 
 function loadFromLocal() {

@@ -6,6 +6,7 @@ import { Equipment } from './components/Equipment'
 import { SimpleInspection } from './components/SimpleInspection'
 import { LegalInspection } from './components/LegalInspection'
 import { FillRecovery } from './components/FillRecovery'
+import { DestructionCertificate } from './components/DestructionCertificate'
 import { Report } from './components/Report'
 import { VendorTechnician } from './components/VendorTechnician'
 import { ProcessControlSheet } from './components/ProcessControlSheet'
@@ -19,6 +20,7 @@ const NAV = [
   { id: 'simple',     label: '簡易点検',          section: '点検管理' },
   { id: 'legal',      label: '法定点検',          section: '点検管理' },
   { id: 'fill',       label: '充填・回収',         section: 'フロン記録' },
+  { id: 'certificate', label: '充填・回収破壊証明書', section: 'フロン記録' },
   { id: 'process',    label: '行程管理票（廃棄時）', section: 'フロン記録' },
   { id: 'report',     label: '漏洩量・報告書',     section: 'フロン記録' },
 ]
@@ -89,7 +91,8 @@ export default function App() {
     vendors:   <VendorTechnician {...pageProps} />,
     simple:    <SimpleInspection {...pageProps} />,
     legal:     <LegalInspection {...pageProps} />,
-    fill:      <FillRecovery {...pageProps} />,
+    fill:      <FillRecovery {...pageProps} onNavigate={setCurrentNav} />,
+    certificate: <DestructionCertificate {...pageProps} />,
     process:   <ProcessControlSheet db={db} toast={showToast} />,
     report:    <Report db={db} toast={showToast} />,
   }

@@ -9,7 +9,7 @@ function sum(records, key) {
 }
 
 export function LegalRecordPrint({ eq, records, db, onClose }) {
-  const sorted = records.slice().sort((a, b) => a.date.localeCompare(b.date))
+  const sorted = records.slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''))
   const firstDate = sorted[0]?.date || ''
   const lastDate = sorted[sorted.length - 1]?.date || ''
 

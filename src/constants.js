@@ -52,6 +52,13 @@ export const COMPANY_INFO = {
   registrationNo: '0110100267',
 }
 
+// 充填・回収破壊証明書 ヘッダー用 支社一覧（原本レイアウト再現用）
+export const COMPANY_OFFICES = [
+  { label: '本　社', address: '札幌市東区北24条東4丁目1-1', tel: '011-751-8686', fax: '011 702-0070' },
+  { label: '函館営業所', address: '函館市八幡町2番14号', tel: '0138-44-7150', fax: '0138-44-7151' },
+  { label: '旭川営業所', address: '旭川市永山2条23丁目3-12', tel: '0166-73-8272', fax: '0166-73-8273' },
+]
+
 // 帳票参考表示用 主要冷媒GWP値（一部）
 export const GWP_REFERENCE_ROW = [
   { label: 'R22',    gwp: 1810 },

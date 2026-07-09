@@ -40,7 +40,7 @@ export function SimpleInspection({ db, addRecord, deleteRecord, updateRecord, to
     setForm(emptyForm())
   }
 
-  const sorted = [...db.simple].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30)
+  const sorted = [...db.simple].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 30)
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

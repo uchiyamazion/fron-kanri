@@ -29,7 +29,7 @@ export function Dashboard({ db }) {
       upcoming.push({ date: nd, name: `${eq.id} ${eq.name}`, type: '法定', diff: d })
     }
     // Simple inspection
-    const lastSi = simple.filter(s => s.eqId === eq.id).sort((a, b) => b.date.localeCompare(a.date))[0]
+    const lastSi = simple.filter(s => s.eqId === eq.id).sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]
     const nextSi = lastSi ? addMonths(lastSi.date, 3) : null
     if (nextSi) {
       const ds = daysDiff(nextSi)
@@ -39,7 +39,7 @@ export function Dashboard({ db }) {
     }
   })
 
-  upcoming.sort((a, b) => a.date.localeCompare(b.date))
+  upcoming.sort((a, b) => (a.date || '').localeCompare(b.date || ''))
   const upcomingTop5 = upcoming.slice(0, 5)
 
   const active = equipment.filter(e => e.status === 'active').length

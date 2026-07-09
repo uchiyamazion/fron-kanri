@@ -30,7 +30,7 @@ export function LegalInspection({ db, addRecord, updateRecord, deleteRecord, toa
   const [showPrint, setShowPrint] = useState(false)
 
   const eq = db.equipment.find(e => e.id === eqId)
-  const rows = db.legal.filter(r => r.eqId === eqId).slice().sort((a, b) => a.date.localeCompare(b.date))
+  const rows = db.legal.filter(r => r.eqId === eqId).slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''))
 
   function field(row, key) {
     return {

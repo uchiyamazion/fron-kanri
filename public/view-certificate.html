@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フロン類充填・回収破壊証明書｜シオンテクノス</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "MS PGothic","Hiragino Kaku Gothic ProN",sans-serif; background: #999; color: #000; }
+.ctrl-bar { background: #185FA5; padding: 10px 16px; display: flex; gap: 8px; align-items: center; position: sticky; top: 0; z-index: 50; }
+.cb { padding: 8px 18px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.cb-p { background: #fff; color: #185FA5; }
+.ctrl-note { font-size: 11px; color: rgba(255,255,255,.75); margin-left: 4px; }
+.wrap { max-width: 800px; margin: 16px auto 40px; background: #fff; box-shadow: 0 3px 20px rgba(0,0,0,.35); padding: 28px; }
+#loading, #error { text-align: center; padding: 60px 20px; color: #fff; font-size: 14px; }
+.error { color: #ffdddd; }
+
+table { width: 100%; border-collapse: collapse; }
+.cell { border: 1px solid #4FB3C4; padding: 5px 8px; font-size: 10.5px; vertical-align: middle; }
+.lbl { color: #2E9CB0; font-weight: 500; white-space: nowrap; width: 110px; background: #F4FBFC; }
+.sublbl { color: #2E9CB0; width: 70px; white-space: nowrap; background: #F4FBFC; }
+.title-row td { border: none; padding-bottom: 16px; }
+.title-box { border: 1.5px solid #4FB3C4; border-radius: 4px; padding: 10px 20px; font-size: 19px; font-weight: 700; color: #2E9CB0; text-align: center; }
+.office-box { border: 1.3px solid #4FB3C4; padding: 7px 10px; font-size: 9px; color: #2E9CB0; vertical-align: top; line-height: 1.5; }
+.office-box .off { margin-bottom: 3px; display: flex; gap: 4px; }
+.customer-row { display: flex; align-items: flex-end; gap: 8px; margin: 4px 0 14px; border-bottom: 1px solid #000; padding-bottom: 4px; width: 55%; font-size: 13px; }
+.check { display: inline-block; width: 12px; height: 12px; border: 1.3px solid #2E9CB0; text-align: center; line-height: 11px; font-size: 10px; font-weight: 700; margin-right: 6px; }
+.note { font-size: 10px; margin: 8px 0 2px; }
+.bottom-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 6px; }
+.bottom-note { font-size: 10px; line-height: 1.5; }
+.qr-box { text-align: center; flex-shrink: 0; margin-left: 12px; }
+.qr-box img { width: 60px; height: 60px; display: block; }
+.qr-caption { font-size: 7px; color: #888; margin-top: 2px; }
+.footer-logo { text-align: center; margin-top: 14px; font-size: 15px; font-weight: 700; color: #2E9CB0; }
+
+@media print {
+  .ctrl-bar { display: none !important; }
+  body { background: #fff; }
+  .wrap { box-shadow: none; margin: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl-bar">
+  <button class="cb cb-p" onclick="window.print()">印刷 / PDF保存</button>
+  <span class="ctrl-note">スマホの場合は共有メニューから「PDFとして保存」も選べます</span>
+</div>
+
+<div id="loading">読み込み中…</div>
+<div id="error" style="display:none"></div>
+
+<div class="wrap" id="doc" style="display:none">
+  <table class="title-row"><tr>
+    <td class="title-box" style="width:58%">フロン類充填・回収破壊証明書</td>
+    <td style="width:3%"></td>
+    <td class="office-box" id="offices"></td>
+  </tr></table>
+
+  <div class="customer-row">
+    <span id="p-orderCustomerName"></span>
+    <span style="margin-left:auto">御中</span>
+  </div>
+
+  <table>
+    <tr><td class="cell lbl">交付年月日</td><td class="cell" colspan="5" id="p-issueDate"></td></tr>
+    <tr><td class="cell lbl" rowspan="2">整備を発注した管理者<br><span style="font-size:9px;font-weight:400">（機器の所有者等）</span></td><td class="cell sublbl">住所</td><td class="cell" colspan="4" id="p-orderAddress"></td></tr>
+    <tr><td class="cell sublbl">氏名・名称</td><td class="cell" colspan="4" id="p-orderCustomerName2"></td></tr>
+    <tr><td class="cell lbl" rowspan="3">管理担当者</td><td class="cell sublbl">住所</td><td class="cell" colspan="4" id="p-adminAddress"></td></tr>
+    <tr><td class="cell sublbl">氏名・名称</td><td class="cell" colspan="4" id="p-adminName"></td></tr>
+    <tr><td class="cell sublbl">電話番号</td><td class="cell" colspan="4" id="p-adminTel"></td></tr>
+    <tr><td class="cell lbl" rowspan="2">充填・回収する機器がある施設(建物)名</td><td class="cell sublbl">住所</td><td class="cell" colspan="4" id="p-facilityAddress"></td></tr>
+    <tr><td class="cell sublbl">施設の名称<br>(建物名)</td><td class="cell" colspan="4" id="p-facilityName"></td></tr>
+    <tr><td class="cell lbl">機器の種類<br><span style="font-size:9px;font-weight:400">※□にチェック</span></td>
+      <td class="cell" colspan="2"><span class="check" id="chk-aircon"></span>エアコンディショナー</td>
+      <td class="cell" colspan="3"><span class="check" id="chk-fridge"></span>冷蔵機器及び冷凍機器</td></tr>
+    <tr><td class="cell lbl" rowspan="2">機器の特定情報</td><td class="cell sublbl">管理番号</td><td class="cell" colspan="4" id="p-eqId"></td></tr>
+    <tr><td class="cell sublbl">型式</td><td class="cell" id="p-eqModel"></td><td class="cell sublbl">製造番号</td><td class="cell" colspan="2" id="p-eqSerial"></td></tr>
+    <tr><td class="cell lbl">備　考</td><td class="cell" colspan="5" id="p-note"></td></tr>
+  </table>
+
+  <div class="note">【下記の通りフロン類を充填・回収いたしました】</div>
+
+  <table>
+    <tr>
+      <td class="cell" style="width:60px"></td>
+      <td class="cell" style="text-align:center;color:#2E9CB0">作業年月日</td>
+      <td class="cell" style="text-align:center;color:#2E9CB0">フロンの種類</td>
+      <td class="cell" style="text-align:center;color:#2E9CB0">フロンの量</td>
+      <td class="cell" style="text-align:center;color:#2E9CB0">事由</td>
+      <td class="cell" style="text-align:center;color:#2E9CB0">GWP値</td>
+    </tr>
+    <tr>
+      <td class="cell" style="text-align:center;color:#2E9CB0" rowspan="2">回収<br><span style="font-size:8px">（無し充填量は含まず）</span></td>
+      <td class="cell" id="p-rec1Date"></td><td class="cell" id="p-rec1Ref"></td><td class="cell" id="p-rec1Amount"></td><td class="cell">修繕・廃棄</td><td class="cell" id="p-rec1Gwp"></td>
+    </tr>
+    <tr>
+      <td class="cell" id="p-rec2Date"></td><td class="cell" id="p-rec2Ref"></td><td class="cell" id="p-rec2Amount"></td><td class="cell">修繕・廃棄</td><td class="cell" id="p-rec2Gwp"></td>
+    </tr>
+    <tr>
+      <td class="cell" style="text-align:center;color:#2E9CB0" rowspan="2">充填</td>
+      <td class="cell" id="p-fill1Date"></td><td class="cell" id="p-fill1Ref"></td><td class="cell" id="p-fill1Amount"></td><td class="cell">設置時・整備時</td><td class="cell" id="p-fill1Gwp"></td>
+    </tr>
+    <tr>
+      <td class="cell" id="p-fill2Date"></td><td class="cell" id="p-fill2Ref"></td><td class="cell" id="p-fill2Amount"></td><td class="cell">設置時・整備時</td><td class="cell" id="p-fill2Gwp"></td>
+    </tr>
+    <tr>
+      <td class="cell" style="text-align:center;color:#2E9CB0" rowspan="3">充填回収業者</td>
+      <td class="cell sublbl">住所</td><td class="cell" colspan="2" id="p-vendorAddress"></td><td class="cell sublbl">電話番号</td><td class="cell" id="p-vendorTel"></td>
+    </tr>
+    <tr>
+      <td class="cell sublbl">氏名・名称</td><td class="cell" colspan="2" id="p-vendorName"></td><td class="cell sublbl">登録番号</td><td class="cell" id="p-vendorRegistrationNo"></td>
+    </tr>
+    <tr>
+      <td class="cell sublbl">充填作業者又は<br>立会者（冷媒フロン類取扱技術者）</td><td class="cell" colspan="2" id="p-technicianName"></td><td class="cell sublbl">資格者番号</td><td class="cell" id="p-technicianQualNo"></td>
+    </tr>
+  </table>
+
+  <div class="bottom-row">
+    <div class="bottom-note">
+      機器の管理者の皆様へ<br>
+      ※この「充填・回収証明書」は、算定漏えい量の計算に必要な書類となりますので、保存しておいてください。
+    </div>
+  </div>
+
+  <div class="footer-logo">シオンテクノス株式会社</div>
+</div>
+
+<script>
+const OFFICES = [
+  { label: '本　社', address: '札幌市東区北24条東4丁目1-1', tel: '011-751-8686', fax: '011 702-0070' },
+  { label: '函館営業所', address: '函館市八幡町2番14号', tel: '0138-44-7150', fax: '0138-44-7151' },
+  { label: '旭川営業所', address: '旭川市永山2条23丁目3-12', tel: '0166-73-8272', fax: '0166-73-8273' },
+];
+document.getElementById('offices').innerHTML = OFFICES.map((o,i) =>
+  `<div class="off"><span style="white-space:nowrap;font-weight:${i===0?700:500};font-size:${i===0?11:9}px">${o.label}</span>` +
+  `<span>${i===0?'<b>シオンテクノス株式会社　</b>':''}${o.address}<br>電話${o.tel}　FAX${o.fax}</span></div>`
+).join('');
+</script>
+<script src="js/config.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const certId = params.get('id');
+
+function set(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = (v == null || v === '') ? '' : v;
+}
+function fmtDate(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d)) return '';
+  return d.getFullYear() + '　年　　' + (d.getMonth()+1) + '　月　　' + d.getDate() + '　日';
+}
+function fmtRowDate(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d)) return '';
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+
+function render(data) {
+  set('p-issueDate', fmtDate(data.issueDate));
+  set('p-orderAddress', data.orderAddress);
+  set('p-orderCustomerName', data.orderCustomerName);
+  set('p-orderCustomerName2', data.orderCustomerName);
+  set('p-adminAddress', data.adminAddress);
+  set('p-adminName', data.adminName);
+  set('p-adminTel', data.adminTel);
+  set('p-facilityAddress', data.facilityAddress);
+  set('p-facilityName', data.facilityName);
+  set('p-eqId', data.eqId);
+  set('p-eqModel', data.eqModel);
+  set('p-eqSerial', data.eqSerial);
+  set('p-note', data.note);
+
+  document.getElementById(data.equipmentType === 'fridge' ? 'chk-fridge' : 'chk-aircon').textContent = '✓';
+
+  const ref = data.eqRef || '';
+  const gwp = data.eqGwp || '';
+  if (data.rec1Amount) { set('p-rec1Date', fmtRowDate(data.rec1Date)); set('p-rec1Ref', ref); set('p-rec1Amount', data.rec1Amount + ' kg'); set('p-rec1Gwp', '－'); }
+  if (data.rec2Amount) { set('p-rec2Date', fmtRowDate(data.rec2Date)); set('p-rec2Ref', ref); set('p-rec2Amount', data.rec2Amount + ' kg'); set('p-rec2Gwp', '－'); }
+  if (data.fill1Amount) { set('p-fill1Date', fmtRowDate(data.fill1Date)); set('p-fill1Ref', ref); set('p-fill1Amount', data.fill1Amount + ' kg'); set('p-fill1Gwp', gwp); }
+  if (data.fill2Amount) { set('p-fill2Date', fmtRowDate(data.fill2Date)); set('p-fill2Ref', ref); set('p-fill2Amount', data.fill2Amount + ' kg'); set('p-fill2Gwp', gwp); }
+
+  set('p-vendorAddress', data.vendorAddress);
+  set('p-vendorTel', data.vendorTel);
+  set('p-vendorName', data.vendorName);
+  set('p-vendorRegistrationNo', data.vendorRegistrationNo);
+  set('p-technicianName', data.technicianName);
+  set('p-technicianQualNo', data.technicianQualNo);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('doc').style.display = 'block';
+}
+
+async function load() {
+  if (!certId) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+    document.getElementById('error').textContent = '証明書IDが指定されていません';
+    return;
+  }
+  try {
+    const url = GAS_URL + '?action=cert_get&id=' + encodeURIComponent(certId);
+    const res = await fetch(url, { redirect: 'follow' });
+    const json = await res.json();
+    if (json.status === 'error' || !json.data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = '証明書が見つかりません';
+      return;
+    }
+    render(json.data);
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+    document.getElementById('error').textContent = '読み込みに失敗しました';
+  }
+}
+load();
+</script>
+</body>
+</html>

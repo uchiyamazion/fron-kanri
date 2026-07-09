@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { today, calcCO2 } from '../utils'
 import { GWP } from '../constants'
 import { Badge } from './Badge'
-import { CertificatePrint } from './CertificatePrint'
 
 const emptyFill = () => ({ eqId: '', date: today(), amount: '', vendorId: '', technicianId: '', reason: '定期補充', note: '' })
 const emptyRec  = () => ({ eqId: '', date: today(), amount: '', vendorId: '', technicianId: '', cert: '', reason: '廃棄時回収' })
@@ -10,10 +9,9 @@ const emptyRec  = () => ({ eqId: '', date: today(), amount: '', vendorId: '', te
 const FILL_REASONS = ['定期補充', '漏洩対応', '修理後補充', '新規設置']
 const REC_REASONS  = ['廃棄時回収', '修理時回収', '更新工事']
 
-export function FillRecovery({ db, addRecord, deleteRecord, toast }) {
+export function FillRecovery({ db, addRecord, deleteRecord, toast, onNavigate }) {
   const [fill, setFill] = useState(emptyFill())
   const [rec, setRec]   = useState(emptyRec())
-  const [showCert, setShowCert] = useState(false)
 
   const setF = k => e => setFill(f => ({ ...f, [k]: e.target.value }))
   const setR = k => e => setRec(r => ({ ...r, [k]: e.target.value }))
@@ -35,7 +33,7 @@ export function FillRecovery({ db, addRecord, deleteRecord, toast }) {
   const all = [
     ...db.fills.map(f => ({ ...f, kind: 'fill' })),
     ...db.recoveries.map(r => ({ ...r, kind: 'recovery' })),
-  ].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 40)
+  ].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 40)
 
   function del(id, kind) {
     if (!confirm('削除しますか？')) return
@@ -114,7 +112,7 @@ export function FillRecovery({ db, addRecord, deleteRecord, toast }) {
       <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.1)', borderRadius: 12, padding: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <span style={{ fontWeight: 500, fontSize: 13 }}>充填・回収 履歴</span>
-          <button onClick={() => setShowCert(true)} style={{ padding: '5px 12px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12 }}>証明書発行</button>
+          <button onClick={() => onNavigate?.('certificate')} style={{ padding: '5px 12px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12 }}>証明書発行</button>
         </div>
         {all.length === 0
           ? <div style={{ color: '#888', fontSize: 12 }}>記録がありません</div>
@@ -152,8 +150,6 @@ export function FillRecovery({ db, addRecord, deleteRecord, toast }) {
           )
         }
       </div>
-
-      {showCert && <CertificatePrint db={db} onClose={() => setShowCert(false)} toast={toast} />}
     </div>
   )
 }
