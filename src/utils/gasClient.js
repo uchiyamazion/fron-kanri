@@ -67,6 +67,11 @@ export async function gasDeleteEquipment(id) {
   return gasPost({ action: 'eq_delete', id })
 }
 
+/** 法定点検記録・簡易点検記録・業者マスタ・技術者マスタ・証明書を即時削除 */
+export async function gasDeleteRecord(collection, id) {
+  return gasPost({ action: 'record_delete', collection, id })
+}
+
 // ── 充填・回収記録 ────────────────────────────────────────────
 
 export async function gasFetchFillRecords(eqId, year) {
