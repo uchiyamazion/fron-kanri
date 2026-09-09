@@ -3,6 +3,7 @@ import { useDB } from './hooks/useDB'
 import { useToast } from './hooks/useToast'
 import { Dashboard } from './components/Dashboard'
 import { Equipment } from './components/Equipment'
+import { Property } from './components/Property'
 import { SimpleInspection } from './components/SimpleInspection'
 import { LegalInspection } from './components/LegalInspection'
 import { FillRecovery } from './components/FillRecovery'
@@ -15,6 +16,7 @@ import { SyncStatus } from './utils/gasClient'
 
 const NAV = [
   { id: 'dashboard',  label: 'ダッシュボード', section: 'メイン' },
+  { id: 'property',   label: '物件管理',         section: 'メイン' },
   { id: 'equipment',  label: '機器台帳',         section: 'メイン' },
   { id: 'vendors',    label: '業者・技術者',      section: 'メイン' },
   { id: 'simple',     label: '簡易点検',          section: '点検管理' },
@@ -87,6 +89,7 @@ export default function App() {
 
   const pages = {
     dashboard: <Dashboard db={db} />,
+    property:  <Property {...pageProps} />,
     equipment: <Equipment {...pageProps} />,
     vendors:   <VendorTechnician {...pageProps} />,
     simple:    <SimpleInspection {...pageProps} />,

@@ -6,6 +6,7 @@ const SYNC_DEBOUNCE_MS = 2000
 
 const defaultDB = {
   equipment: [],
+  properties: [],
   simple: [],
   legal: [],
   fills: [],
@@ -89,7 +90,7 @@ export function useDB() {
     if (!gasEnabled()) return
     if (key === 'equipment') {
       gasDeleteEquipment(id).catch(err => console.warn('gasDeleteEquipment failed:', err))
-    } else if (['legal', 'simple', 'vendors', 'technicians', 'certificates'].includes(key)) {
+    } else if (['legal', 'simple', 'vendors', 'technicians', 'certificates', 'properties'].includes(key)) {
       gasDeleteRecord(key, id).catch(err => console.warn('gasDeleteRecord failed:', err))
     }
     // fills / recoveries: 充填・回収記録シートは列構成不明のため個別削除は行わない（従来通りローカルのみ）
