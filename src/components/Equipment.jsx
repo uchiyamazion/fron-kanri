@@ -3,8 +3,12 @@ import { Badge, statusVariant, statusLabel } from './Badge'
 import { REFRIGERANT_OPTIONS, EQUIPMENT_STATUS } from '../constants'
 import { today, daysDiff, nextLegalInspection, legalInspectionType } from '../utils'
 
+const CATEGORY_OPTIONS = ['冷凍冷蔵ユニット', 'エアコン', 'その他']
+const USAGE_OPTIONS = ['冷凍・冷蔵用', '空調用', 'その他']
+
 const empty = () => ({
-  id: '', name: '', model: '', location: '', customerName: '',
+  id: '', name: '', maker: '', model: '', serial: '', category: '', usage: '',
+  location: '', customerName: '',
   ref: 'R-410A', charge: '', kw: '',
   installed: today(), status: 'active', note: '',
   facilityName: '', facilityAddress: '', operManager: '',
@@ -83,7 +87,7 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
                       <td style={{ padding: '8px 8px', fontFamily: 'monospace', fontSize: 11 }}>{eq.id}</td>
                       <td style={{ padding: '8px 8px' }}>
                         <div style={{ fontWeight: 500 }}>{eq.name}</div>
-                        <div style={{ fontSize: 11, color: '#888' }}>{eq.model}</div>
+                        <div style={{ fontSize: 11, color: '#888' }}>{[eq.maker, eq.model].filter(Boolean).join(' ')}{eq.serial ? `（製番: ${eq.serial}）` : ''}</div>
                       </td>
                       <td style={{ padding: '8px 8px', fontSize: 11 }}>{eq.location}</td>
                       <td style={{ padding: '8px 8px' }}><span style={{ background: '#f1efe8', color: '#5f5e5a', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>{eq.ref}</span></td>
@@ -119,7 +123,21 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器ID *</label><input value={form.id} onChange={set('id')} placeholder="例: AC-001" disabled={!!editId} /></div>
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器名 *</label><input value={form.name} onChange={set('name')} placeholder="例: 業務用エアコン" /></div>
             </div>
-            <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>型番・メーカー</label><input value={form.model} onChange={set('model')} placeholder="例: 三菱 PEA-P224" /></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
+              <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>設備製造者（メーカー）</label><input value={form.maker} onChange={set('maker')} placeholder="例: 三菱電機株式会社" /></div>
+              <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>型式</label><input value={form.model} onChange={set('model')} placeholder="例: ECOV-EN110C1" /></div>
+              <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>製番</label><input value={form.serial} onChange={set('serial')} placeholder="例: 86W00470" /></div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+              <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>分類</label>
+                <input value={form.category} onChange={set('category')} placeholder="例: 冷凍冷蔵ユニット" list="category-options" />
+                <datalist id="category-options">{CATEGORY_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
+              </div>
+              <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>用途</label>
+                <input value={form.usage} onChange={set('usage')} placeholder="例: 冷凍・冷蔵用" list="usage-options" />
+                <datalist id="usage-options">{USAGE_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
+              </div>
+            </div>
             <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器の管理者（お客様名・法人名）</label><input value={form.customerName} onChange={set('customerName')} placeholder="例: 株式会社○○" /></div>
             <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>設置場所 *</label><input value={form.location} onChange={set('location')} placeholder="例: A棟1F 会議室" /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>

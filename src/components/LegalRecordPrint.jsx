@@ -49,7 +49,7 @@ export function LegalRecordPrint({ eq, records, db, onClose }) {
               <td style={{ ...cell, width: 60 }}>氏名・名称</td>
               <td style={{ ...cell, width: 220 }}>{eq.customerName || eq.name}</td>
               <td style={{ ...labelCell, width: 90 }}>設備製造者</td>
-              <td style={cell} colSpan={3}>{eq.model || ''}</td>
+              <td style={cell} colSpan={3}>{eq.maker || ''}</td>
             </tr>
             <tr>
               <td style={labelCell}>機器の所在</td>
@@ -69,13 +69,13 @@ export function LegalRecordPrint({ eq, records, db, onClose }) {
               <td style={labelCell}>運転管理責任者</td>
               <td style={cell} colSpan={2}>{eq.operManager || ''}</td>
               <td style={labelCell}>使用機器 分類</td>
-              <td style={cell} colSpan={3}>{eq.model || ''}</td>
+              <td style={cell} colSpan={3}>{eq.category || ''}</td>
             </tr>
             <tr>
               <td style={labelCell}>点検等業者名住所</td>
               <td style={cell} colSpan={2}>{vendorLine}</td>
               <td style={labelCell}>製番</td>
-              <td style={cell} colSpan={3}>{eq.id}</td>
+              <td style={cell} colSpan={3}>{eq.serial || ''}</td>
             </tr>
             <tr>
               <td style={labelCell}>使用冷媒</td>

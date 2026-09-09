@@ -17,7 +17,7 @@ const newCert = eq => ({
   adminTel: '',
   facilityAddress: eq.facilityAddress || eq.location || '',
   facilityName: eq.facilityName || eq.name || '',
-  equipmentType: (eq.model || '').includes('冷蔵') || (eq.model || '').includes('冷凍') ? 'fridge' : 'aircon',
+  equipmentType: (eq.category || eq.model || '').includes('冷蔵') || (eq.category || eq.model || '').includes('冷凍') ? 'fridge' : 'aircon',
   rec1Date: '', rec1Amount: '', rec2Date: '', rec2Amount: '',
   fill1Date: '', fill1Amount: '', fill2Date: '', fill2Amount: '',
   vendorId: '', technicianId: '',
