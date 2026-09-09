@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import { Badge, statusVariant, statusLabel } from './Badge'
-import { REFRIGERANT_OPTIONS, EQUIPMENT_STATUS } from '../constants'
-import { today, daysDiff, nextLegalInspection, legalInspectionType } from '../utils'
-
-const CATEGORY_OPTIONS = ['冷凍冷蔵ユニット', 'エアコン', 'その他']
-const USAGE_OPTIONS = ['冷凍・冷蔵用', '空調用', 'その他']
+import { REFRIGERANT_OPTIONS, EQUIPMENT_STATUS, EQUIPMENT_CATEGORY_OPTIONS, EQUIPMENT_USAGE_OPTIONS } from '../constants'
+import { today, daysDiff, nextLegalInspection } from '../utils'
 
 const empty = () => ({
   id: '', name: '', maker: '', model: '', serial: '', category: '', usage: '',
@@ -131,11 +128,11 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>分類</label>
                 <input value={form.category} onChange={set('category')} placeholder="例: 冷凍冷蔵ユニット" list="category-options" />
-                <datalist id="category-options">{CATEGORY_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
+                <datalist id="category-options">{EQUIPMENT_CATEGORY_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
               </div>
               <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>用途</label>
-                <input value={form.usage} onChange={set('usage')} placeholder="例: 冷凍・冷蔵用" list="usage-options" />
-                <datalist id="usage-options">{USAGE_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
+                <input value={form.usage} onChange={set('usage')} placeholder="例: 冷凍用・プロセス冷却用" list="usage-options" />
+                <datalist id="usage-options">{EQUIPMENT_USAGE_OPTIONS.map(o => <option key={o} value={o} />)}</datalist>
               </div>
             </div>
             <div style={{ marginBottom: 10 }}><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>機器の管理者（お客様名・法人名）</label><input value={form.customerName} onChange={set('customerName')} placeholder="例: 株式会社○○" /></div>
