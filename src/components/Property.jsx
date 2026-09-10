@@ -24,6 +24,9 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
   const [form, setForm] = useState(emptyProperty())
   const [editId, setEditId] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
+  const [checkedIds, setCheckedIds] = useState([])
+  const [mergeModal, setMergeModal] = useState(false)
+  const [mergeKeepId, setMergeKeepId] = useState(null)
 
   const [eqModal, setEqModal] = useState(false)
   const [eqForm, setEqForm] = useState(emptyEquipment())
@@ -40,6 +43,40 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
 
   const selectedProperty = properties.find(p => p.id === selectedId) || null
   const selectedEquipment = selectedId ? db.equipment.filter(e => e.propertyId === selectedId) : []
+
+  function toggleChecked(id) {
+    setCheckedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
+  // ── 統合 ──
+  function openMergeModal() {
+    if (checkedIds.length < 2) { toast('統合する物件を2つ以上選択してください', 'error'); return }
+    setMergeKeepId(checkedIds[0])
+    setMergeModal(true)
+  }
+  function closeMergeModal() { setMergeModal(false) }
+
+  function doMerge() {
+    const keepId = mergeKeepId
+    const others = checkedIds.filter(id => id !== keepId)
+    if (!keepId || others.length === 0) { toast('残す物件を選んでください', 'error'); return }
+
+    let movedCount = 0
+    others.forEach(otherId => {
+      db.equipment.filter(e => e.propertyId === otherId).forEach(eq => {
+        updateRecord('equipment', eq.id, { propertyId: keepId })
+        movedCount++
+      })
+      deleteRecord('properties', otherId)
+    })
+
+    setCheckedIds([])
+    setMergeModal(false)
+    if (selectedId && others.includes(selectedId)) setSelectedId(keepId)
+    toast(`${others.length}件の物件を統合し、機器${movedCount}台を付け替えました`)
+  }
+
+  const checkedProperties = properties.filter(p => checkedIds.includes(p.id))
 
   // ── 物件モーダル ──
   function openNewProperty() { setForm(emptyProperty()); setEditId(null); setModal(true) }
@@ -67,6 +104,7 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
     }
     deleteRecord('properties', p.id)
     if (selectedId === p.id) setSelectedId(null)
+    setCheckedIds(prev => prev.filter(id => id !== p.id))
     toast('物件を削除しました')
   }
 
@@ -102,26 +140,32 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
       {/* ── 物件一覧 ── */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="物件名・住所・顧客名で検索..." style={{ flex: 1 }} />
-        <button onClick={openNewProperty} style={{ padding: '6px 14px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>
+        {checkedIds.length >= 2 && (
+          <button onClick={openMergeModal} style={{ padding: '6px 14px', background: '#854F0B', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap' }}>
+            選択した{checkedIds.length}件を統合
+          </button>
+        )}
+        <button onClick={openNewProperty} style={{ padding: '6px 14px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap' }}>
           + 物件追加
         </button>
       </div>
 
       <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.1)', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: 640 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: 680 }}>
             <colgroup>
+              <col style={{ width: 28 }} />
               <col style={{ width: 160 }} /><col style={{ width: 200 }} /><col style={{ width: 140 }} />
               <col style={{ width: 120 }} /><col style={{ width: 70 }} /><col style={{ width: 80 }} />
             </colgroup>
             <thead>
-              <tr>{['物件名', '住所', '顧客名', '運転管理責任者', '機器数', '操作'].map(h => (
+              <tr>{['', '物件名', '住所', '顧客名', '運転管理責任者', '機器数', '操作'].map(h => (
                 <th key={h} style={{ textAlign: 'left', padding: '7px 8px', borderBottom: '0.5px solid rgba(0,0,0,.1)', fontSize: 11, color: '#888', fontWeight: 500 }}>{h}</th>
               ))}</tr>
             </thead>
             <tbody>
               {filtered.length === 0
-                ? <tr><td colSpan={6} style={{ textAlign: 'center', color: '#888', padding: 20 }}>物件が登録されていません</td></tr>
+                ? <tr><td colSpan={7} style={{ textAlign: 'center', color: '#888', padding: 20 }}>物件が登録されていません</td></tr>
                 : filtered.map(p => (
                   <tr
                     key={p.id}
@@ -132,6 +176,9 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
                       background: selectedId === p.id ? '#EDF3FA' : 'transparent',
                     }}
                   >
+                    <td style={{ padding: '8px 8px' }} onClick={e => e.stopPropagation()}>
+                      <input type="checkbox" checked={checkedIds.includes(p.id)} onChange={() => toggleChecked(p.id)} />
+                    </td>
                     <td style={{ padding: '8px 8px', fontWeight: 500 }}>{p.name}</td>
                     <td style={{ padding: '8px 8px', fontSize: 11 }}>{p.address || '—'}</td>
                     <td style={{ padding: '8px 8px', fontSize: 11 }}>{p.customerName || '—'}</td>
@@ -283,6 +330,35 @@ export function Property({ db, addRecord, updateRecord, deleteRecord, upsertEqui
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button onClick={closeEquipmentModal} style={{ padding: '7px 14px', border: '0.5px solid rgba(0,0,0,.2)', borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 13 }}>キャンセル</button>
               <button onClick={saveEquipment} style={{ padding: '7px 14px', background: '#185FA5', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>保存</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── 統合モーダル ── */}
+      {mergeModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 20, width: 480, maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, fontWeight: 500, fontSize: 14 }}>
+              <span>物件の統合</span>
+              <button onClick={closeMergeModal} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 18 }}>×</button>
+            </div>
+            <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+              残す物件を1つ選んでください。他の物件に紐づく機器はすべて選んだ物件へ付け替えられ、選ばれなかった物件は削除されます。
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+              {checkedProperties.map(p => (
+                <label key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', border: `1px solid ${mergeKeepId === p.id ? '#185FA5' : 'rgba(0,0,0,.12)'}`, borderRadius: 8, cursor: 'pointer', background: mergeKeepId === p.id ? '#EDF3FA' : 'transparent' }}>
+                  <input type="radio" name="merge-keep" checked={mergeKeepId === p.id} onChange={() => setMergeKeepId(p.id)} />
+                  <div>
+                    <div style={{ fontWeight: 500, fontSize: 12.5 }}>{p.name}</div>
+                    <div style={{ fontSize: 11, color: '#888' }}>{p.address || '住所未設定'} ／ 機器{equipmentCountOf(p.id)}台</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button onClick={closeMergeModal} style={{ padding: '7px 14px', border: '0.5px solid rgba(0,0,0,.2)', borderRadius: 8, background: 'transparent', cursor: 'pointer', fontSize: 13 }}>キャンセル</button>
+              <button onClick={doMerge} style={{ padding: '7px 14px', background: '#854F0B', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}>この物件に統合する</button>
             </div>
           </div>
         </div>
