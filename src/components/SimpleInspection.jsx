@@ -66,11 +66,11 @@ export function SimpleInspection({ db, addRecord, deleteRecord, updateRecord, to
 
         <div style={{ marginBottom: 10 }}>
           <label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 6 }}>チェック項目</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 16px' }}>
             {CHECK_ITEMS.map((item, i) => (
-              <label key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
-                <input type="checkbox" checked={form.checks[i]} onChange={() => toggleCheck(i)} />
-                {item}
+              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, cursor: 'pointer', lineHeight: 1.4 }}>
+                <input type="checkbox" checked={form.checks[i]} onChange={() => toggleCheck(i)} style={{ marginTop: 2, flexShrink: 0 }} />
+                <span>{item}</span>
               </label>
             ))}
           </div>
