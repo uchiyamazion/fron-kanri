@@ -16,8 +16,14 @@ input, select, textarea {
   font-family: inherit;
   color: inherit;
   background: #fff;
-  width: 100%;
   outline: none;
+}
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  width: 100%;
+}
+input[type="checkbox"], input[type="radio"] {
+  width: auto;
+  flex-shrink: 0;
 }
 input:focus, select:focus, textarea:focus {
   border-color: #185FA5;
