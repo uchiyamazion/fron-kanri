@@ -8,7 +8,7 @@ const empty = () => ({
   location: '', customerName: '',
   ref: 'R-410A', charge: '', kw: '',
   installed: today(), status: 'active', note: '',
-  facilityName: '', facilityAddress: '', operManager: '',
+  facilityName: '', facilityAddress: '', operManager: '', propertyId: '',
 })
 
 export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
@@ -45,6 +45,21 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
   }
 
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
+
+  function selectProperty(e) {
+    const propertyId = e.target.value
+    const p = (db.properties || []).find(pr => pr.id === propertyId)
+    setForm(f => ({
+      ...f,
+      propertyId,
+      facilityName: p ? p.name : f.facilityName,
+      facilityAddress: p ? p.address : f.facilityAddress,
+      operManager: p ? (p.operManager || f.operManager) : f.operManager,
+      customerName: p ? (p.customerName || f.customerName) : f.customerName,
+    }))
+  }
+
+  const propertyNameOf = (propId) => (db.properties || []).find(p => p.id === propId)?.name
 
   return (
     <div>
@@ -85,6 +100,7 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
                       <td style={{ padding: '8px 8px' }}>
                         <div style={{ fontWeight: 500 }}>{eq.name}</div>
                         <div style={{ fontSize: 11, color: '#888' }}>{[eq.maker, eq.model].filter(Boolean).join(' ')}{eq.serial ? `（製番: ${eq.serial}）` : ''}</div>
+                        {propertyNameOf(eq.propertyId) && <div style={{ fontSize: 10.5, color: '#185FA5' }}>物件: {propertyNameOf(eq.propertyId)}</div>}
                       </td>
                       <td style={{ padding: '8px 8px', fontSize: 11 }}>{eq.location}</td>
                       <td style={{ padding: '8px 8px' }}><span style={{ background: '#f1efe8', color: '#5f5e5a', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>{eq.ref}</span></td>
@@ -158,6 +174,13 @@ export function Equipment({ db, upsertEquipment, deleteRecord, toast }) {
 
             <div style={{ borderTop: '0.5px dashed rgba(0,0,0,.15)', paddingTop: 10, marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: '#aaa', marginBottom: 8 }}>帳票出力用（冷媒漏えい点検・整備記録簿）</div>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>物件（既存の物件から選ぶと施設名称・住所等を自動反映）</label>
+                <select value={form.propertyId} onChange={selectProperty}>
+                  <option value="">— 物件を選択しない（自由入力） —</option>
+                  {(db.properties || []).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>施設名称（未入力時は設置場所を使用）</label><input value={form.facilityName} onChange={set('facilityName')} placeholder="例: ○○ビル" /></div>
                 <div><label style={{ fontSize: 11, color: '#888', display: 'block', marginBottom: 4 }}>運転管理責任者</label><input value={form.operManager} onChange={set('operManager')} placeholder="例: 山田 太郎" /></div>
